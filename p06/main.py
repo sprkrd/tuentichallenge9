@@ -15,43 +15,67 @@ class PrefixTree:
             except KeyError:
                 self._children[word[0]] = PrefixTree(word[1:], index)
 
-    def _str_indented(self, indent):
-        s = str(self._index) + "\n"
-        if self._children:
-            s += " "*indent
-        s += ("\n"+" "*indent).join(k+": "+v._str_indented(indent+2) for k,v in self._children.items())
-        return s
 
-    def __str__(self):
-        return self._str_indented(0)
-
-
-def findCharacterPrecedencies(alphabet, root):
+def findCharacterPrecedencies(words):
+    trie_root = PrefixTree()
+    alphabet = set()
+    for index, word in enumerate(words):
+        trie_root.addWord(word, index)
+        alphabet.update(word)
     graph = {c:set() for c in alphabet}
-    stack = [root]
+    stack = [trie_root]
     while stack:
         trie = stack.pop()
-        for child in trie._children.values:
-            stack.append(child)
         sorted_chars = sorted(trie._children, key=lambda char: trie._children[char]._index)
         for char_before, char_after in zip(sorted_chars, sorted_chars[1:]):
             graph[char_before].add(char_after)
+        for child in trie._children.values():
+            stack.append(child)
     return graph
+
+
+def findTopologicalOrder(graph):
+    unmarked = set(graph.keys())
+    order = []
+    while unmarked:
+        stack = [(next(iter(unmarked)), False)]
+        while stack:
+            node, expanded = stack.pop()
+            if node not in unmarked:
+                continue
+            if expanded:
+                order.append(node)
+                unmarked.remove(node)
+            else:
+                stack.append((node, True))
+                for successor in graph[node]:
+                    stack.append((successor, False))
+    order.reverse()
+    return order
+
+
+def isTopologicalOrderUnique(graph, order):
+    for from_, to in zip(order,order[1:]):
+        if to not in graph[from_]:
+            return False
+    return True
 
 
 def main():
     N = int(input())
     for i in range(1, N+1):
         alphabet = set()
-        trie = PrefixTree()
         M = int(input())
-        for index in range(M):
-            word = input()
-            trie.addWord(word, index)
-            alphabet.update(word)
-        graph = {c:[] for c in alphabet}
-        stack = [trie]
-        while stack:
+        words = []
+        for _ in range(M):
+            words.append(input())
+        graph = findCharacterPrecedencies(words)
+        order = findTopologicalOrder(graph)
+        print("Case #{}: ".format(i), end="")
+        if isTopologicalOrderUnique(graph, order):
+            print(" ".join(order))
+        else:
+            print("AMBIGUOUS")
 
 
 if __name__ == "__main__":

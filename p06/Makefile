@@ -11,5 +11,5 @@ submitOutput: submitInput main.py
 	./main.py < submitInput > submitOutput
 
 clean:
-	rm -rf testOutput submitOutput
+	rm -rf *Output
 
