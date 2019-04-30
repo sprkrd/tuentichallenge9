@@ -64,7 +64,6 @@ def isTopologicalOrderUnique(graph, order):
 def main():
     N = int(input())
     for i in range(1, N+1):
-        alphabet = set()
         M = int(input())
         words = []
         for _ in range(M):
