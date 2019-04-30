@@ -9,15 +9,16 @@ def getTopologicalOrder(graph):
     marked = set()
     stack = [("Galactica", False)]
     while stack:
-        planet, visited = stack.pop()
-        if visited:
+        planet, expanded = stack.pop()
+        if planet in marked:
+            continue
+        if expanded:
             marked.add(planet)
             topological_order.append(planet)
         else:
             stack.append((planet, True))
             for successor in graph.get(planet, []):
-                if successor not in marked:
-                    stack.append((successor, False))
+                stack.append((successor, False))
     topological_order.reverse()
     return topological_order
 
