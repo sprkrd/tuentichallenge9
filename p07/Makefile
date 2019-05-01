@@ -15,5 +15,5 @@ submitOutput: submitInput Main.class
 	java Main < submitInput > submitOutput
 
 clean:
-	rm -rf Main.class *Output
+	rm -rf *.class *Output
 
